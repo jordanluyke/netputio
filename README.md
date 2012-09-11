@@ -8,7 +8,7 @@ A .Net library for the [Put.io][1] [API v2][2].
 
 You are now free to use commands such as:
 ```csharp
-nputio..Request(ParseRequest.Transfers.add("magnet:?xt=urn:btih", "0"));
+nputio.Request(ParseRequest.Transfers.add("magnet:?xt=urn:btih", "0"));
 ```
 
 [1]: http://put.io/
