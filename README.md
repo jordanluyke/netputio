@@ -10,6 +10,10 @@ You are now free to use commands such as:
 ```csharp
 nputio.Request(ParseRequest.Transfers.add("magnet:?xt=urn:btih", "0"));
 ```
+and
+```csharp
+nputio.Request(ParseRequest.Files.properties("654321"));
+```
 
 [1]: http://put.io/
 [2]: https://api.put.io/v2/docs/
