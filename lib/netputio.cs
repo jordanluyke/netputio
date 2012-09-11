@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
-using System.IO;
-//using System.Web;
-//using System.Threading;
 using System.Threading.Tasks;
 
 class netputio
@@ -13,6 +10,7 @@ class netputio
     private string clientID;
     private string regRedirectUri;
     private string clientSecret;
+    private string code;
     public string Token { get; private set; }
 
     public netputio(string YOUR_CLIENT_ID, string YOUR_REGISTERED_REDIRECT_URI, string YOUR_CLIENT_SECRET)
@@ -26,10 +24,12 @@ class netputio
 
     public Task TokenRequest(string CODE)
     {
-        string request = ParseRequest.TokenRequestURL(clientID, clientSecret, regRedirectUri, CODE);
-        WebClient wc = new WebClient();
-        string[] jsonreturn = wc.DownloadString(request).Split('"');
-        wc.Dispose();
+        this.code = CODE;
+        string request = ParseRequest.TokenRequestURL(clientID, clientSecret, regRedirectUri, code);
+        string[] jsonreturn;
+        using (WebClient wc = new WebClient()) {
+            jsonreturn = wc.DownloadString(request).Split('"');
+        }
         if (jsonreturn[1] == "access_token")
             this.Token = jsonreturn[3];
         else
@@ -37,39 +37,29 @@ class netputio
         return null;
     }
 
-    /*public void Request(string[] method)
-    {
-        HttpWebRequest httpWReq = (HttpWebRequest)WebRequest.Create("https://api.put.io/v2/" + method[0]);
-
-        UTF8Encoding encoding = new UTF8Encoding();
-
-        byte[] data = encoding.GetBytes(method[1] + "&oauth_token=" + this.Token);
-
-        httpWReq.Method = "POST";
-        httpWReq.ContentType = "application/x-www-form-urlencoded";
-        httpWReq.ContentLength = data.Length;
-
-        using (Stream newStream = httpWReq.GetRequestStream()) {
-            newStream.Write(data, 0, data.Length);
-        }
-    }*/
-
     public string Request(string[] mnfo)
     {
         string HtmlResult = "";
         using (WebClient wc = new WebClient()) {
-            string URI = "https://api.put.io/v2/" + mnfo[1];
+            string URI = "https://api.put.io/v2" + mnfo[1];
             if (mnfo[0] == "GET") {
                 HtmlResult = wc.DownloadString(URI + "?oauth_token=" + this.Token);
-                //HtmlResult = wc.DownloadString("https://api.put.io/v2/files/list?oauth_token=" + this.Token);
             } else if (mnfo[0] == "POST") {
                 wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
                 mnfo[2] += "&oauth_token=" + this.Token;
                 HtmlResult = wc.UploadString(URI, mnfo[2]);
+            } else if (mnfo[0] == "GETRedirect") {
+                var request = (HttpWebRequest)WebRequest.Create(URI + "?oauth_token=" + this.Token);
+                request.Method = "HEAD";
+                request.AllowAutoRedirect = false;
+                string location;
+                using (var response = request.GetResponse() as HttpWebResponse) {
+                    location = response.GetResponseHeader("Location");
+                }
+                HtmlResult = location;
             }
         }
         return HtmlResult;
     }
-
 
 }
