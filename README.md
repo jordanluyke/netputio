@@ -3,7 +3,7 @@ A .Net library for the [Put.io][1] [API v2][2].
 
 #### How
 1. Log in at netputio.AuthURL (sets this up when instantiating netputio class)
-2. Obtain code from redirect url (https://YOUR_REGISTERED_REDIRECT_URI/?code=CODE
+2. Obtain code from redirect url (https://YOUR_REGISTERED_REDIRECT_URI/?code=CODE)
 3. Obtain netputio.Token by using netputio.TokenRequest(code);
 
 You are now free to use commands such as:
